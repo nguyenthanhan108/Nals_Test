@@ -1,0 +1,328 @@
+﻿@using System.Collections
+@using NALSTEST.Models.FunctionModel
+@using NALSTEST.Models.RoleModel
+@model NALSTEST.Models.SystemAdministrator.UserModel.UserListViewModel
+@{
+    ViewBag.Title = "Thêm mới người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Quản lý người dùng");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Quản lý người dùng", "Thêm mới người dùng" });
+        }
+
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- PAGE CONTENT BEGINS -->
+                <form class="form-horizontal" role="form">
+                    <div class="form-group clearfix">
+                        <div class="col-md-offset-2 col-md-9">
+                            <label id="lblMessage" class="lblmsg"></label>
+                        </div>
+                    </div>                                       
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right"> Tên đăng nhập(<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" id="user-name" maxlength="20" type="text" placeholder="Tên đăng nhập" onchange="checkUserName(this.value)">
+                            <span class="red" id="user-name-warn"></span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Họ và tên(<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" type="text" id="full-name" maxlength="35" placeholder="Họ và tên">
+                        </div>
+                    </div>
+                    @*<div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Mật khẩu (<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" type="password" id="password" maxlength="20"  placeholder="Mật khẩu" onchange="checkPassword(this.value)">
+                            <span class="red" id="password-warn"></span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top">Nhập lại mật khẩu(<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" type="password" id="confirmpassword" placeholder="Nhập lại mật khẩu" onchange="checkConfirmPassword(this.value)">
+                            <span id="confirmpsw-warn" class="red"></span>
+                        </div>
+                    </div>*@
+                    
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Email(<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" type="text" id="email" maxlength="100" placeholder="Email"  onchange="checkEmail(this.value)">
+                            <span class="red" id="email-warn"></span>
+                        </div>
+                    </div>
+                     <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Số điện thoại: </label>
+                        <div class="col-sm-10">
+                            <input class="col-xs-9 col-sm-3" type="text" id="phone"  maxlength="10"   placeholder="Số điện thoại" onchange="checkPhone(this.value)">
+                            <span class="red" id="phone-warn"></span>
+                        </div>
+                    </div>
+                     
+                    <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Chi nhánh(<span class="red">*</span>): </label>
+                            <div class="col-sm-10">
+                                @Html.DropDownList("branch-code", new SelectList( Model.listBranch, "BranchCode", "BranchName")," -- Chọn --", new { @class = "col-xs-9 col-sm-3" })
+                            </div>
+                    </div>
+                    <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Phòng giao dịch(<span class="red">*</span>): </label>
+                            <div class="col-sm-10">
+                                @Html.DropDownList("pos-code", new SelectList(Model.listPos, "PosDetailId", "PosDetailName")," -- Chọn --", new { @class = "col-xs-9 col-sm-3" })
+                            </div>
+                     </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top">Quyền(<span class="red">*</span>): </label>
+                        <div class="col-sm-10">
+                            @Html.DropDownList("role-id", new SelectList((IEnumerable)ViewData["RoleList"], "RoleId", "RoleName")," -- Chọn --", new { @class = "col-xs-9 col-sm-3" })
+                            @*<input class="col-xs-9 col-sm-3" type="password" id="confirmpassword" placeholder="Confirm Password" onchange="checkConfirmPassword(this.value)">
+                            <span id="confirmpsw-warn" class="red"></span>*@
+                        </div>
+                    </div>
+                    @*<div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right"> Status: </label>
+                        <div class="col-sm-9">
+                            <label class="position-relative">
+                                <input type="checkbox" class="ace" id="status">
+                                <span class="lbl"></span>
+                            </label>
+                        </div>
+                    </div>*@
+                    @*<div class="form-group clearfix hidden">
+                        <label class="col-sm-2 control-label no-padding-right p_top" >Super Admin:</label>
+                        <div class="col-sm-9">
+                            <label class="position-relative">
+                                <input type="checkbox" class="ace" id="super-admin">
+                                <span class="lbl"></span>
+                            </label>
+                        </div>
+                    </div>*@
+                    <div class="clearfix form-actions">
+                        <div class="col-md-offset-2 col-md-9"><a class="btn btn-info" id="create-user" href="">Cập nhật</a>&nbsp;<a class="btn btn-info" href="@Url.Action("Index", "Admin", new { f = FunctionIdConstant.FuncSystemId, c = FunctionIdConstant.FuncUserListId })">Quay Lại</a></div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.col -->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Notification</h4>
+            </div>
+            <div class="modal-body">Do you want to delete this record?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        var check = true;
+        function checkPassword(val) {
+            var paternPw = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d$@@$!%*#?&]{6,}$/;
+            if (!paternPw.test(val) || val.length < 6) {
+                document.getElementById('password-warn').innerHTML = "Mật khẩu phải từ 6 -20 ký tự, bao gồm ít nhất 1 ký tự số, 1 ký tự chữ";
+                $('#password').val("");
+                $('#password').focus();
+                check = false;
+            }
+            else {
+                document.getElementById('password-warn').innerHTML = "";
+                check = true;
+            }
+        }
+        //function checkUserName(val) {
+        //    var paternUs = /^[a-zA-Z0-9]+$/;
+        //    if (!paternUs.test(val)) {
+        //        document.getElementById('user-name-warn').innerHTML = "Tên đăng nhập chỉ chứa ký tự số, chữ cái và dấu_";
+        //        $('#user-name').val("");
+        //        $('#user-name').focus();
+        //        check = false;
+        //    }
+        //    else {
+        //        document.getElementById('user-name-warn').innerHTML = "";
+        //        check = true;
+        //    }
+        //}
+        function checkConfirmPassword(val) {
+            var pw = $('#password').val();
+            if (val !== pw) {
+                document.getElementById('confirmpsw-warn').innerHTML = "Mật khẩu và mật khẩu nhập lại không trùng nhau.";
+                $('#confirmpassword').val("");
+                $('#confirmpassword').focus();
+                check = false;
+            }
+            else {
+                document.getElementById('confirmpsw-warn').innerHTML = "";
+                check = true;
+            }
+        }
+        function checkEmail(val) {
+            //var re = /^(([^<>()[\]\\.,;:\s@@"]+(\.[^<>()[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([[a-betinkv\-0-9]+\.)+([a-zA-Z]+\.)+[a-zA-Z]{2,}))$/;
+
+
+            var re = /^(([^<>()[\]\\.,;:\s@@"]+(\.[^<>()[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(val)) {
+                document.getElementById('email-warn').innerHTML = "Email không đúng định dạng";
+                $('#email').val("");
+                $('#email').focus();
+                check = false;
+            }
+            else {
+                document.getElementById('email-warn').innerHTML = "";
+                check = true;
+            }
+        }
+        function checkPhone(val) {
+           
+            var mobileNo = /^[0]{1}[0-9]{9,11}$/;
+            if (!mobileNo.test(val)) {
+                document.getElementById('phone-warn').innerHTML = "Số điện thoại không hợp lệ, Quý khách vui lòng nhập lại";
+                $('#phone').val("");
+                $('#phone').focus();
+                check = true;
+            }
+            else {
+                document.getElementById('phone-warn').innerHTML = "";
+                check = true;
+            }
+            
+                
+        }
+        $(document).ready(function () {
+           
+            $("#create-user").click(function () {
+                if (!check) return false;
+                var model = {
+                    UserName: $("#user-name").val(),
+                    FullName: $('#full-name').val(),
+                    Password: $('#password').val(),
+                    RoleId: $('#role-id').val(),
+                    BranchCode: $('#branch-code').val(),
+                    PosCode: $('#pos-code').val(),
+                    Phone: $('#phone').val(),
+                    Email: $('#email').val(),
+                    SupperAdmin: getValueCheckBox("#super-admin")
+                };
+                if (model.UserName === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng nhập tên đăng nhập";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#user-name").focus();
+                    return false;
+                }
+                if (model.FullName === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng nhập họ và tên";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#full-name").focus();
+                    return false;
+                }
+                if (model.Email === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng nhập email";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#email").focus();
+                    return false;
+                }
+                if (model.BranchCode === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng chọn chi nhánh";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#branch-code").focus();
+                    return false;
+                }
+                if (model.PosCode === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng chọn phòng giao dịch";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#pos-code").focus();
+                    return false;
+                }
+                if (model.RoleId === "") {
+                    document.getElementById("lblMessage").innerText = "Vui lòng chọn quyền";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#role-id").focus();
+                    return false;
+                }
+                
+                
+                
+                //if (model.Password === "") {
+                //    document.getElementById("lblMessage").innerText = "Mật khẩu không được bỏ trống, vui lòng nhập thông tin.";
+                //    document.getElementById("lblMessage").style.color = "red";
+                //    $("#password").focus();
+                //    return false;
+                //}
+                //if ($('#confirmpassword').val() === "") {
+                //    document.getElementById("lblMessage").innerText = "Nhập lại mật khẩu không được bỏ trống, vui lòng nhập thông tin.";
+                //    document.getElementById("lblMessage").style.color = "red";
+                //    $("#confirmpassword").focus();
+                //    return false;
+                //}
+                //if ($('#confirmpassword').val() != $('#password').val()) {
+                //    document.getElementById("lblMessage").innerText = "Mật khẩu và mật khẩu nhập lại không trùng nhau.";
+                //    document.getElementById("lblMessage").style.color = "red";
+                //    $("#confirmpassword").focus();
+                //    return false;
+                //}
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    url: getRootUrl() + '/Admin/CreateUser',
+                    type: 'POST',
+                    data: JSON.stringify(model)
+                }).success(function (data) {
+                    if (redirecToLoginByTypeOf(data)) {
+                        window.location.href = getRootUrl() + "/Account/Login";
+                    } else {
+                        alert(data.mesg);
+                        if (data.result == 1) {
+                            window.location.reload();
+                            //$("#user-name").val("");
+                            //$('#full-name').val("");
+                            //$('#password').val("");
+                            //$('#confirmpassword').val("");
+                            //document.getElementById("super-admin").checked = false;
+                            ////window.location.href = getRootUrl() + '/Admin/Index';
+                        }
+                    }
+
+                }).error(function (data) {
+
+                });
+                return false;
+            });
+
+            function getValueCheckBox(id) {
+                if ($(id).is(':checked')) {
+                    return true;
+                }
+                return false;
+            }
+        })
+
+        function redirectToLogin(data) {
+            if (data.toString().indexOf("!DOCTYPE") > 0) {
+                return true;
+            }
+            return false;
+        }
+        function redirecToLoginByTypeOf(data) {
+            if (typeof data == "string") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+}

@@ -1,0 +1,136 @@
+﻿@using NALSTEST.Models.FunctionModel
+@using NALSTEST.Models.UserModel
+
+@{
+    ViewBag.Title = "Thêm mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userLogin = (UserLoginViewModel)ViewBag.UserLogin;
+}
+
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Quản lý quyền");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Quản lý quyền", "Thêm mới" });
+        }
+
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- PAGE CONTENT BEGINS -->
+                <form class="form-horizontal" role="form">
+                    <input type="hidden" value="@userLogin.UserId" id="user-id-hidden" />
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Tên nhóm quyền(<span class="red">*</span>): </label>
+                        <div class="col-sm-9">
+                            <input class="col-xs-10 col-sm-5" id="role-name" type="text" maxlength="64" placeholder="Tên nhóm quyền" onchange="checkRoleName(this.value)">
+                            <span class="red" id="role-name-warn"></span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right p_top"> Mô tả: </label>
+                        <div class="col-sm-9">
+                            <input class="col-xs-10 col-sm-5" id="role-description" maxlength="200" type="text" placeholder="Mô tả">
+                            <span class="red" id="role-des-warn"></span>
+                        </div>
+                    </div>
+                    <div class="form-group clearfix">
+                        <label class="col-sm-2 control-label no-padding-right"> Chức năng: </label>
+                        @{
+                            Html.RenderPartial("_FunctionsDisplay");
+                        }
+                    </div>
+                    <div class="clearfix form-actions">
+                        <div class="col-md-offset-3 col-md-9"><a class="btn btn-info" id="create-role" href="">Cập nhật</a>&nbsp;<a class="btn btn-info" href="@Url.Action("Index", "Role", new { f = FunctionIdConstant.FuncSystemId, c = FunctionIdConstant.FuncRoleListId })">Quay lại</a></div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Notification</h4>
+            </div>
+            <div class="modal-body">Do you want to delete this record?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+        function checkRoleName(val) {
+            var paternUs = /^[a-zA-Z0-9]+$/;
+            if (!paternUs.test(val)) {
+                document.getElementById('role-name-warn').innerHTML = "Vui lòng nhập tên nhóm quyền và chỉ chứa ký tự số, chữ cái và dấu_";
+                $('#role-name').val("");
+                $('#role-name').focus();
+                return false;
+            }
+            else {
+                document.getElementById('role-name-warn').innerHTML = "";
+            }
+        }     
+        $(document).ready(function() {            
+            $("#create-role").click(function() {
+                var model = {
+                    UserId: $('#user-id-hidden').val(),
+                    RoleName: $('#role-name').val(),
+                    RoleDesc: $('#role-description').val(),
+                    RoleStatus: "1",
+                    ArrayFunc: getListIdFunction()
+                };
+                if (model.RoleName === "") {
+                    alert("Vui lòng nhập tên nhóm quyền.");
+                    return false;
+                }
+                if (model.ArrayFunc === "") {
+                    alert("Vui lòng chọn chức năng.");
+                    return false;
+                }
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    url: getRootUrl() + '/Role/CreateRole',
+                    type: 'POST',
+                    data: JSON.stringify(model)
+                }).success(function(data) {
+                    if (redirectToLogin(data)) {
+                        window.location.href=  getRootUrl() + "/Account/Login";
+                    } else {
+                        alert(data);
+                    }
+
+                }).error(function(data) {
+
+                });
+                return false;
+            });
+        });
+
+        function getListIdFunction() {
+            var funcIds = "";
+            $('.tab-content input:checked').each(function() {
+                funcIds = funcIds + $(this).val() + ",";
+            });
+            funcIds = funcIds.substring(0, funcIds.length - 1);
+            return funcIds;
+        }
+
+        function redirectToLogin(data) {
+            if (data.toString().indexOf("!DOCTYPE") > 0) {
+                return true;
+                //window.location.href=  getRootUrl() + "/Account/Login";
+            }
+            return false;
+        }
+    </script>
+}

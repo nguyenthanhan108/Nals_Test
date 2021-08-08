@@ -1,0 +1,154 @@
+﻿@using System.Collections
+@using NALSTEST.Models.FunctionModel
+@using NALSTEST.Models.UserModel
+
+@{
+    ViewBag.Title = "Quản lý quyền";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var roleModel = (UserLoginViewModel) ViewBag.UserLogin;
+    var userId = roleModel.UserId;
+    var f = FunctionIdConstant.FuncSystemId;
+    var c = FunctionIdConstant.FuncRoleListId;
+}
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Danh sách");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Quản lý quyền", "Danh sách" });
+        }
+        <div class="row" ng-app="systemSearchApp">
+            <div class="col-xs-12" ng-controller="roleController">
+                <form class="form-horizontal row clearfix" role="form">
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Tên quyền: </label>
+                            <div class="col-sm-7">
+                                <input class="form-control" type="text" placeholder="Tên quyền" id="id-role-name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Trạng thái: </label>
+                            <div class="col-sm-7">
+                                @Html.DropDownList("status-code", new SelectList((IEnumerable)ViewData["RoleStatus"], "StatusCode", "StatusName"), "--All--", new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="clearfix form-actions center">
+                        <a class="btn btn-primary" href="" ng-click="roleSearch()">Tìm kiếm</a>
+                        <a href="@Url.Action("CreateRole", "Role", new{f=FunctionIdConstant.FuncSystemId, c=FunctionIdConstant.FuncRoleListId} )" id="btn-create-role" class="btn btn-warning">Thêm mới</a>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="table_list_wrapper" class="dataTables_wrapper form-inline">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="dataTables_length">
+                                        <label>
+                                            Chọn số bản ghi
+                                            <select ng-model="PerPageItems" ng-init="PerPageItems='10'">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select> 
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="dataTables_filter">
+                                        <label>
+                                             Tìm kiếm:
+                                            <input type="text" class="form-control input-sm" placeholder="Tìm kiếm" ng-model="search" ng-change="filter()">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <table class="table table-striped table-bordered table-hover dataTable" id="tblUser">
+                                    <tr>
+                                        <th>
+                                           STT
+                                        </th>
+                                        <th>
+                                            Tên quyền
+                                        </th>
+                                        <th>
+                                            Mô tả
+                                        </th>                                        
+                                        <th>
+                                            Người tạo
+                                        </th>
+                                        <th>
+                                           Ngày tạo
+                                        </th>
+                                        <th>
+                                            Trạng thái
+                                        </th>
+                                        <th>
+                                            Thao tác
+                                        </th>
+                                    </tr>
+                                    <tr ng-show="filteredItems > 0" ng-repeat="item in filtered = (datas |filter :search) | PageStart:(currentPage-1)*PerPageItems | limitTo:PerPageItems">
+
+                                        <td style="width: 70px">
+                                            {{item.Stt}}
+                                        </td>
+                                        <td style="width: 200px">
+                                            {{item.RoleName}}
+                                        </td>
+                                        <td style="width: 250px">
+                                            {{item.RoleDesc}}
+                                        </td>                                        
+                                        <td>
+                                            {{item.CreateByUser}}
+                                        </td>
+                                        <td>
+                                            {{item.CreateDate}}
+                                        </td>
+                                        <td>
+                                            <span ng-if="item.Status == true" class="label label-sm label-success">Active</span>
+                                            <span ng-if="item.Status == false" class="label label-danger label-sm">Inactive</span>
+                                        </td>
+                                        <td style="width: 100px">
+                                            @*<div ng-show="item.UserId == @userId || @userId == 1">
+                                                <a title="Edit" class="blue" ng-href="/Role/EditRole/{{item.RoleId}}?f=@f&c=@c"> <i class="default-icon fa fa-pencil bigger-150"></i></a>&nbsp;
+                                                <a ng-if="item.Status == false" title="Thay đổi trạng thái" ng-click="changeStatus(item)" class="blue" href=""> <i class="ic_default ic_unlock"></i></a>
+                                                <a ng-if="item.Status == true" title="Thay đổi trạng thái" ng-click="changeStatus(item)" class="red" href=""> <i class="ic_default ic_lock"></i></a>
+                                            </div>*@
+                                            <div ng-show="item.RoleId != 1">
+                                            <a title="Sửa" class="blue" ng-href="~/Role/EditRole/{{item.RoleId}}?f=@f&c=@c"> <i class="default-icon fa fa-pencil bigger-150"></i></a>&nbsp;
+                                            @*<a title="Delete role" ng-click="deleteRole(item)" href="" class="red"> <i class="default-icon fa fa-trash-o bigger-150"></i></a>*@
+                                            <a ng-if="item.Status == false" title="Thay đổi trạng thái" ng-click="changeStatus(item)" class="blue" href=""> <i class="ic_default ic_unlock"></i></a>
+                                            <a ng-if="item.Status == true" title="Thay đổi trạng thái" ng-click="changeStatus(item)" class="red" href=""> <i class="ic_default ic_lock"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td ng-show="filteredItems <= 0" colspan="7" style="text-align: center">
+                                            "Không có kết quả tìm kiếm"
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div ng-show="filteredItems > 0">
+                                <pagination num-pages="numberPages" total-items="filteredItems" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" ng-model="currentPage" items-per-page="PerPageItems"></pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script src="@Url.Content("~/Scripts/system-search.js")"></script>
+}
+

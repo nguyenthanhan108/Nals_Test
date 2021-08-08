@@ -1,0 +1,165 @@
+﻿@using MBCambodia.Models.FunctionModel
+@model MBCambodia.Models.SystemParameter.PackageModel.PackageCreateViewModel
+
+@{
+    ViewBag.Title = "Package Manager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var f = FunctionIdConstant.FuncOperationListId;
+    var c = FunctionIdConstant.FuncServicePackageListId;
+}
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Package List");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Package Manager", "Package List" });
+        }
+        <div class="row" ng-app="systemSearchApp">
+            <div class="col-xs-12" ng-controller="packageController">
+                <form class="form-horizontal row clearfix" role="form">
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Package Code: </label>
+                            <div class="col-sm-7">
+                                <input class="form-control" type="text" placeholder="Package Code" id="code">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Package Name: </label>
+                            <div class="col-sm-7">
+                                <input class="form-control" type="text" placeholder="Package Name" id="name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Status: </label>
+                            <div class="col-sm-7">
+                                @Html.DropDownList("status", new SelectList(new Dictionary<string, string>()
+                                {
+                                    {"1", "Active"},{"0","Inactive"}
+                                }, "Key", "Value"), "-- All --", new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group clearfix">
+                            <label class="col-sm-5 control-label no-padding-right p_top"> Branch: </label>
+                            <div class="col-sm-7">
+                                @Html.DropDownList("branch-code", new SelectList(Model.listbranch, "BranchCode", "BranchName"), "-- All --", new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="clearfix form-actions center">
+                        <a class="btn btn-primary" href="" ng-click="packageSearch()">Search</a>
+                        <a href="@Url.Action("Create", "Package", new { f = FunctionIdConstant.FuncOperationListId, c = FunctionIdConstant.FuncServicePackageListId })" i id="btn-create-serviceType" class="btn btn-warning">Add new</a>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div id="table_list_wrapper" class="dataTables_wrapper form-inline">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <div class="dataTables_length">
+                                        <label>
+                                            Display
+                                            <select ng-model="PerPageItems" ng-init="PerPageItems='10'">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30">30</option>
+                                                <option value="40">40</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select> Records
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="dataTables_filter">
+                                        <label>
+                                            Search:
+                                            <input type="text" class="form-control input-sm" placeholder="search" ng-model="search" ng-change="filter()">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <table class="table table-striped table-bordered table-hover dataTable" id="tblUser">
+                                    <tr>
+                                        <th>
+                                            No
+                                        </th>
+                                        <th>
+                                            Package Code
+                                        </th>
+                                        <th>
+                                            Package Name
+                                        </th>
+                                        <th>
+                                            Branch
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                    <tr ng-show="filteredItems > 0" ng-repeat="item in filtered = (datas |filter :search) | PageStart:(currentPage-1)*PerPageItems | limitTo:PerPageItems">
+
+                                        <td style="width: 50px">
+                                            {{item.Ordinal}}
+                                        </td>
+                                        <td style="width: 150px">
+                                            {{item.PackageCode}}
+                                        </td>
+                                        <td style="width: 400px">
+                                            {{item.PackageName}}
+                                        </td>
+                                        <td>
+                                            {{item.BranchName}}
+                                        </td>
+                                        <td>
+                                            <span ng-if="item.PackageStatus == true" class="label label-sm label-success">Active</span>
+                                            <span ng-if="item.PackageStatus == false" class="label label-danger label-sm">Inactive</span>
+                                        </td>
+                                        <td style="width: 150px">
+                                            <a title="Edit Package" class="blue" ng-href="~/Package/Edit/{{item.PackageCode}}?f=@f&c=@c"> <i class="default-icon fa fa-pencil bigger-150"></i></a>&nbsp;
+                                            <a ng-if="item.PackageStatus == false" title="Change Status" ng-click="changeStatus(item)" class="blue" href=""> <i class="ic_default ic_unlock"></i></a>
+                                            <a ng-if="item.PackageStatus == true" title="Change Status" ng-click="changeStatus(item)" class="red" href=""> <i class="ic_default ic_lock"></i></a>
+@*                                            <a title="View Detail" style="font-size: 16px" href="" ng-click="viewDetail(item)" class="blue"><i class="glyphicon glyphicon-info-sign"></i></a>*@
+                                            <a title="Assign Package Service" ng-href="~/Package/AssingPackageService/{{item.PackageCode}}?f=@f&c=@c"><i class="fa fa-plus"></i></a>
+                                            <a title="Assign Service Limit" ng-href="~/Package/AssignPackageLimit/{{item.PackageCode}}?f=@f&c=@c"><i class="ic_default ic_assign_service_limit"></i></a>
+                                            <a title="Assign Service Fee" ng-href="~/Package/AssingPackageServiceFee/{{item.PackageCode}}?f=@f&c=@c"><i class="ic_default ic_assign_service_fee"></i></a>
+                                            <a title="Assign Package Limit" ng-href="~/Package/AssingPackageTotal/{{item.PackageCode}}?f=@f&c=@c"><i class="fa fa-plus-square"></i></a>
+                                            <a title="Assign Package Fee" ng-href="~/Package/AssingPackageFee/{{item.PackageCode}}?f=@f&c=@c"><i class="fa fa-money"></i></a>                                            
+                                            @*<a title="Delete" ng-click="delete(item)" href="" class="red"> <i class="default-icon fa fa-trash-o bigger-150"></i></a>*@
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td ng-show="filteredItems <= 0" colspan="6" style="text-align: center">
+                                            "No search results found"
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div ng-show="filteredItems > 0">
+                                <pagination num-pages="numberPages" total-items="filteredItems" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" ng-model="currentPage" items-per-page="PerPageItems"></pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@{
+    Html.RenderPartial("_ViewDetail");
+}
+@section scripts{
+     <script src="@Url.Content("~/Scripts/system-search.js")"></script>
+}

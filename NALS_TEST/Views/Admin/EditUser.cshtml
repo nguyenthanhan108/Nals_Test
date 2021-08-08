@@ -1,0 +1,186 @@
+﻿@using System.Collections
+@using NALSTEST.Models.FunctionModel
+@model NALSTEST.Models.SystemAdministrator.UserModel.UserListViewModel
+@{
+    ViewBag.Title = "Cập nhật người dùng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Quản lý người dùng");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Quản lý người dùng", "Chỉnh sửa người dùng" });
+        }
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- PAGE CONTENT BEGINS -->
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group clearfix">
+                        <div class="col-md-offset-2 col-md-9">
+                            <label id="lblMessage" class="lblmsg"></label>
+                        </div>
+                        </div>
+                           <div class="form-group clearfix hidden">
+                            <label class="col-sm-2 control-label no-padding-right"> User Id: </label>
+                            <div class="col-sm-10">
+                                @Html.TextBoxFor(m => m.UserId, new { @class = "col-xs-9 col-sm-5", @id = "id", @readonly = "readonly" })
+                            </div>
+                        </div> 
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right"> Tên đăng nhập(<span class="red">*</span>): </label>
+                            <div class="col-sm-10">
+                                @Html.TextBoxFor(m => m.UserName, new { @class = "col-xs-10 col-sm-5", @id = "name", @maxlength="20",  @readonly = "readonly"})
+                                <span id="valname" class="red"></span>
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Họ và tên(<span class="red">*</span>): </label>
+                            <div class="col-sm-10">
+                                @Html.TextBoxFor(m => m.FullName, new { @class = "col-xs-10 col-sm-5", @maxlength="35",@id = "full", placeholder = "Họ và tên"})
+                            </div>
+                        </div> 
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Số điện thoại: </label>
+                            <div class="col-sm-10">
+                                 @Html.TextBoxFor(m => m.Phone, new { @class = "col-xs-10 col-sm-5", @id = "phone", @maxlength="10", placeholder = "Số điện thoại", @onchange="checkPhone(this.value)"})
+                                 <span class="red" id="phone-warn"></span>
+                            </div>
+                        </div>
+                         <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Email: </label>
+                            <div class="col-sm-10">
+                               @Html.TextBoxFor(m => m.Email, new { @class = "col-xs-10 col-sm-5", @id = "email",@maxlength="100", placeholder = "Email",@disabled="disabled", @onchange="checkEmail(this.value)"})
+                                <span class="red" id="email-warn"></span>
+                            </div>
+                        </div>
+                       
+                        <div class="form-group clearfix">
+                            <label class="col-sm-2 control-label no-padding-right p_top"> Quyền: </label>
+                            <div class="col-sm-10">
+                            @Html.DropDownList("role-id", new SelectList(Model.listRole, "RoleId", "RoleName",Model.RoleId),"--- All ---", new { @class = "col-xs-10 col-sm-5" })
+                            @*<input class="col-xs-9 col-sm-3" type="password" id="confirmpassword" placeholder="Confirm Password" onchange="checkConfirmPassword(this.value)">
+                            <span id="confirmpsw-warn" class="red"></span>*@
+                            </div>
+                        </div>                                                       
+                       @*<div class="form-group clearfix">
+                           <label class="col-sm-2 control-label no-padding-right p_top">Super Admin:</label>
+                           <div class="col-sm-10">
+                               <label class="position-relative">
+                                   @Html.CheckBoxFor(m => m.SupperAdmin)                                 
+                                   <span class="lbl"></span>
+                               </label>
+                           </div>
+                       </div>*@
+                         <div class="clearfix form-actions">
+                        <div class="col-md-offset-2 col-md-9"><a class="btn btn-info" id="edit" href="">Cập nhật</a>&nbsp;<a class="btn btn-info" href="@Url.Action("Index", "Admin", new {f=FunctionIdConstant.FuncSystemId,c=FunctionIdConstant.FuncUserListId})">Quay lại</a></div>
+                         </div>                       
+                    </form>              
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Notification</h4>
+            </div>
+            <div class="modal-body">Do you want to delete this record?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        var check = true;
+        function checkEmail(val) {
+            var re = /^(([^<>()[\]\\.,;:\s@@"]+(\.[^<>()[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            if (!re.test(val)) {
+                document.getElementById('email-warn').innerHTML = "Email không hợp lệ. Vui lòng nhập thông tin.";
+                $('#email').val("");
+                $('#email').focus();
+                check = false;
+            }
+            else {
+                document.getElementById('email-warn').innerHTML = "";
+                check = true;
+            }
+        }
+        function checkPhone(val) {
+            var mobileNo = /^[0]{1}[0-9]{8,11}$/;
+            if (!mobileNo.test(val)) {
+                document.getElementById('phone-warn').innerHTML = "Số điện thoại không hợp lệ, Quý khách vui lòng nhập lại";
+                $('#phone').val("");
+                $('#phone').focus();
+                check = false;
+            }
+            else {
+                document.getElementById('phone-warn').innerHTML = "";
+                check = true;
+            }
+        }
+        $(document).ready(function () {
+            $('#edit').click(function () {
+                if (!check) return false;
+                var model = {
+                    UserId: $('#id').val(),
+                    UserName: $('#name').val(),
+                    BranchCode: $('#branch-code').val(),
+                    PosCode: $('#pos-code').val(),
+                    Phone: $('#phone').val(),
+                    Email: $('#email').val(),
+                    FullName: $('#full').val(),
+                    RoleId: $('#role-id').val(),
+                };
+                if (model.UserName === "") {
+                    document.getElementById("lblMessage").innerText = "Tên đăng nhập không được bỏ trống, vui lòng nhập thông tin.";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#name").focus();
+                    return false;
+                }
+                if (model.FullName === "") {
+                    document.getElementById("lblMessage").innerText = "Họ và  tên không được bỏ trống, vui lòng nhập thông tin.";
+                    document.getElementById("lblMessage").style.color = "red";
+                    $("#full").focus();
+                    return false;
+                }
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    url: getRootUrl() + '/Admin/EditUser',
+                    type: 'POST',
+                    data: JSON.stringify(model)
+                }).success(function (data) {
+                    if (redirectToLogin(data)) {
+                        window.location.href = getRootUrl() + "/Account/Login";
+                    } else {
+                        alert(data);
+                        if (data == "Cập nhật người dùng thành công") {
+                            window.location.href = getRootUrl() + "/Admin/Index";
+                        }
+                        //document.getElementById("lblMessage").innerText = data;
+                        //document.getElementById("lblMessage").style.color = "blue";
+                    }
+
+                }).error(function (data) {
+
+                });
+                return false;
+            });
+        });
+
+        function redirectToLogin(data) {
+            if (data.toString().indexOf("!DOCTYPE") > 0) {
+                return true;
+            }
+            return false;
+        }
+    </script>
+}
+

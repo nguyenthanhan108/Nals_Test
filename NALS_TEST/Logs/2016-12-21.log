@@ -1,0 +1,16 @@
+2016-12-21 09:25:14.1257 ERROR GetListCities: System.Data.OracleClient.OracleException (0x80131938): ORA-06550: line 1, column 7:
+PLS-00306: wrong number or types of arguments in call to 'CM_CITIES_GETLIST'
+ORA-06550: line 1, column 7:
+PL/SQL: Statement ignored
+
+   at System.Data.OracleClient.OracleConnection.CheckError(OciErrorHandle errorHandle, Int32 rc)
+   at System.Data.OracleClient.OracleCommand.Execute(OciStatementHandle statementHandle, CommandBehavior behavior, Boolean needRowid, OciRowidDescriptor& rowidDescriptor, ArrayList& resultParameterOrdinals)
+   at System.Data.OracleClient.OracleCommand.Execute(OciStatementHandle statementHandle, CommandBehavior behavior, ArrayList& resultParameterOrdinals)
+   at System.Data.OracleClient.OracleCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.OracleClient.OracleCommand.ExecuteDbDataReader(CommandBehavior behavior)
+   at System.Data.Common.DbCommand.System.Data.IDbCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable[] dataTables, Int32 startRecord, Int32 maxRecords, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataTable dataTable)
+   at DBConnection.OracleDB.ExecuteDataTable(CommandType commandType, String commandText, OracleParameter[] commandParameters) in d:\VNPAY\8.DuanCamboPay\MBCambodia\DBConnection\OracleDB.cs:line 77
+   at MBCambodia.Repository.CitiesStore.CitiesStoreService.GetListCities(String cityCode, String cityName, String status) in d:\VNPAY\8.DuanCamboPay\MBCambodia\MBCambodia\Repository\SystemModule\CitiesStore\CitiesStoreService.cs:line 30

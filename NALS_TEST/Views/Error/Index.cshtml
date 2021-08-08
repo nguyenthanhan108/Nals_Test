@@ -1,0 +1,24 @@
+﻿@using NALSTEST.Models.FunctionModel
+
+@{
+    ViewBag.Title = "Error Manager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    Html.RenderPartial("_NavigationTitleLink", "Error Home");
+}
+<div class="page-content">
+    <div class="page-content-area">
+        @{
+            Html.RenderPartial("_HeaderPage", new[] { "Error Manager", "Error Home" });
+        }
+                <form class="form-horizontal row clearfix" role="form">
+                    <div class="form-group clearfix">
+                        <div class="col-md-offset-2 col-md-9">
+                           <h1 style="color:red">You have no permission for this function</h1>                          
+                        </div>
+                    </div>  
+                </form>
+    </div>
+</div>
+
